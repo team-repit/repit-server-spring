@@ -49,7 +49,7 @@ jobs:
 
       # Docker 이미지 빌드
       - name: Build Docker image
-        run: docker build -t spring-extension .
+        run: docker build -t spring-repit .
 
       # DockerHub 로그인
       - name: Log in to DockerHub
@@ -61,8 +61,8 @@ jobs:
       # DockerHub에 이미지 푸시
       - name: Push Docker image
         run: |
-          docker tag spring-extension ${{ secrets.DOCKER_USERNAME }}/spring-extension:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/spring-extension:latest
+          docker tag spring-repit ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
 
       # EC2에 SSH 접속 후 Docker 컨테이너 실행
       - name: Deploy via SSH
@@ -72,10 +72,10 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/spring-extension:latest
-            docker stop spring-extension-container || true
-            docker rm spring-extension-container || true
-            docker run -d -p 80:8080 --name spring-extension-container ${{ secrets.DOCKER_USERNAME }}/spring-extension:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
+            docker stop spring-repit-container || true
+            docker rm spring-repit-container || true
+            docker run -d -p 80:8080 --name spring-repit-container ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
 
       # ③ SSH 허용 규칙 해제
       - name: Revoke SSH rule
