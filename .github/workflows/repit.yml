@@ -7,8 +7,32 @@ on:
     branches: [ "main" ]
 
 jobs:
+  # PR에서는 빌드 테스트만
+  test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+  # main 브랜치 푸시 시에만 배포
   build-and-deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: []
 
     steps:
       # ① 러너의 공인 IP 추출
@@ -75,7 +99,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
             docker stop spring-repit-container || true
             docker rm spring-repit-container || true
-            docker run -d -p 80:8080 --name spring-repit-container ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
+            docker run -d -p 8080:8080 --name spring-repit-container ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
 
       # ③ SSH 허용 규칙 해제
       - name: Revoke SSH rule
