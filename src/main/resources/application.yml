@@ -2,7 +2,7 @@ socket:
     port: 8080
 socket-server:
     port: 8081
-    host: localhost
+    host: 54.180.156.150
 
 socket-client:
     host: localhost
