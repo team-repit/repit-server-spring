@@ -19,8 +19,7 @@
     // 1. 초기 설정
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
-    const ws = new WebSocket("ws://localhost:8080/signal"); // 서버의 WebSocket 주소
-
+    const ws = new WebSocket("ws://175.193.199.113:8080/signal");
     let peerConnection;
     let localStream;
 

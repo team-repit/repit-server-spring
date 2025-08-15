@@ -37,7 +37,7 @@ dependencies {
 	// testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
+	implementation 'com.corundumstudio.socketio:netty-socketio:2.0.9'
 }
 
 tasks.named('test') {
