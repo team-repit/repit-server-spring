@@ -1,6 +1,6 @@
-package com.repit.repository;
+package com.repit.api.repository;
 
-import com.repit.domain.Member;
+import com.repit.api.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

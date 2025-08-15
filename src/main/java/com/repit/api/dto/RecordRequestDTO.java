@@ -1,4 +1,4 @@
-package com.repit.web.dto;
+package com.repit.api.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

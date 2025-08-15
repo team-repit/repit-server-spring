@@ -1,6 +1,6 @@
-package com.repit.web.dto;
+package com.repit.api.dto;
 
-import com.repit.domain.Member;
+import com.repit.api.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

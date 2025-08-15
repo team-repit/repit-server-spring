@@ -1,4 +1,4 @@
-package com.repit.domain;
+package com.repit.api.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

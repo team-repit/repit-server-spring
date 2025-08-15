@@ -1,4 +1,4 @@
-package com.repit.transport;
+package com.repit.api.transport;
 
 import com.corundumstudio.socketio.Configuration;
 import jakarta.annotation.PreDestroy;

@@ -1,4 +1,4 @@
-package com.repit.web.dto;
+package com.repit.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
-import com.repit.domain.Record;
+import com.repit.api.domain.Record;
 @Getter
 @Setter
 @NoArgsConstructor
