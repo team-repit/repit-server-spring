@@ -1,37 +1,34 @@
-package com.repit.api.transport;
+package com.repit.api.websocket.config;
 
 import com.corundumstudio.socketio.Configuration;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import com.corundumstudio.socketio.SocketIOServer;
 
 @Slf4j
 @org.springframework.context.annotation.Configuration
-public class SocketIOConfig implements ApplicationListener<ApplicationReadyEvent> {
-
+public class SocketIOConfig {
+    // application.yml 파일의 host, port 값 가져와서 자동 바인딩
     @Value("${socket-server.host}")
     private String host;
 
     @Value("${socket-server.port}")
     private int port;
 
-    private SocketIOServer server;
-
     @Bean
     public SocketIOServer socketIOServer() {
         Configuration config = new Configuration();
         config.setHostname(host);
         config.setPort(port);
-        // CORS 문제 해결을 위해 오리진 추가
-        config.setOrigin("https://repit-web.vercel.app"); // 프론트엔드 배포 주소
-
-        server = new SocketIOServer(config);
-        return server;
+        // CORS 허용
+        config.setOrigin("*");
+        return new SocketIOServer(config);
     }
-
+}
+/*
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         log.info("Starting Socket.IO server...");
@@ -46,4 +43,5 @@ public class SocketIOConfig implements ApplicationListener<ApplicationReadyEvent
             server.stop();
         }
     }
-}
+
+ */
