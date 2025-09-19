@@ -238,25 +238,4 @@ src/main/java/com/repit/api/
 | `FILE_WATCH_DIRECTORY` | 파일 감지 디렉토리 | /Users/username/Desktop | ❌ |
 | `FILE_WATCH_PATTERN` | 파일 감지 패턴 | .*_report_\\d+\\.txt$ | ❌ |
 
-## 🤝 기여하기
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이나 제안사항이 있으시면 언제든지 연락주세요:
-
-- **이메일**: your-email@example.com
-- **GitHub Issues**: [Issues 페이지](https://github.com/your-username/repit-server-spring/issues)
-
 ---
-
-⭐ 이 프로젝트가 도움이 되었다면 Star를 눌러주세요!

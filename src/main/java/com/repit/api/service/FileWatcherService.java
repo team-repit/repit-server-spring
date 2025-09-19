@@ -24,15 +24,23 @@ public class FileWatcherService implements CommandLineRunner {
     
     private static final Logger logger = LoggerFactory.getLogger(FileWatcherService.class);
     
-    @Value("${file.watch.directory:${user.home}/Desktop}")
+    @Value("${file.watch.directory:}")
     private String watchDirectory;
     
     @Value("${file.watch.pattern:.*_report_\\d+\\.txt$}")
     private String filePattern;
     
+    @Value("${file.watch.enabled:false}")
+    private boolean watchEnabled;
+    
     private final PoseAnalysisService poseAnalysisService;
     private final RecordService recordService;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "file-watcher");
+        t.setDaemon(true);
+        return t;
+    });
+    private WatchService watchService;
     
     @Autowired
     public FileWatcherService(PoseAnalysisService poseAnalysisService, RecordService recordService) {
@@ -46,6 +54,10 @@ public class FileWatcherService implements CommandLineRunner {
     }
     
     private void startWatching() {
+        if (!watchEnabled || watchDirectory == null || watchDirectory.isBlank()) {
+            logger.info("파일 감지 비활성화됨 (file.watch.enabled=false)");
+            return;
+        }
         executorService.submit(() -> {
             try {
                 watchDirectory();
@@ -63,7 +75,7 @@ public class FileWatcherService implements CommandLineRunner {
             return;
         }
         
-        WatchService watchService = FileSystems.getDefault().newWatchService();
+        watchService = FileSystems.getDefault().newWatchService();
         path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
         
         logger.info("파일 감지 시작: {}", watchDirectory);
@@ -150,5 +162,13 @@ public class FileWatcherService implements CommandLineRunner {
         }
         
         return null;
+    }
+
+    @jakarta.annotation.PreDestroy
+    void shutdown() {
+        try {
+            if (watchService != null) watchService.close();
+        } catch (IOException ignore) { }
+        executorService.shutdownNow();
     }
 }

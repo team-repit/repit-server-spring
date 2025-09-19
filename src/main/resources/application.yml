@@ -52,8 +52,9 @@ spring:
 # 파일 감지 설정
 file:
   watch:
-    directory: ${FILE_WATCH_DIRECTORY:${user.home}/Desktop}
+    directory: ${FILE_WATCH_DIRECTORY:}
     pattern: ${FILE_WATCH_PATTERN:.*_report_\\d+\\.txt$}
+    enabled: ${FILE_WATCH_ENABLED:false}
 
 # 로깅 설정
 logging:
@@ -61,7 +62,7 @@ logging:
     com.repit.api: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # move to dev profile if needed
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -92,3 +93,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

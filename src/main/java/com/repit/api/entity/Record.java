@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "records")
+@Table(name = "records", 
+       uniqueConstraints = @UniqueConstraint(
+           name = "uk_video_path_active", 
+           columnNames = "video_path"
+       ))
 public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

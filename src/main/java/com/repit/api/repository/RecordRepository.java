@@ -13,13 +13,15 @@ import java.util.List;
 @Repository
 public interface RecordRepository extends JpaRepository<Record, Long> {
     
-    // 특정 날짜의 기록 조회
-    @Query("SELECT r FROM Record r WHERE DATE(r.recordedAt) = :date AND r.deletedAt IS NULL")
-    List<Record> findByRecordDate(@Param("date") LocalDate date);
+    // 특정 날짜 범위의 기록 조회
+    @Query("SELECT r FROM Record r WHERE r.deletedAt IS NULL AND r.recordedAt >= :start AND r.recordedAt < :end")
+    List<Record> findByRecordedAtBetween(@Param("start") java.time.LocalDateTime start,
+                                         @Param("end") java.time.LocalDateTime end);
+
     
     // 특정 월의 기록이 있는 날짜들 조회
-    @Query("SELECT DISTINCT r.recordedAt FROM Record r WHERE YEAR(r.recordedAt) = :year AND MONTH(r.recordedAt) = :month AND r.deletedAt IS NULL")
-    List<LocalDateTime> findDistinctRecordDatesByYearAndMonth(@Param("year") int year, @Param("month") int month);
+    @Query("SELECT r FROM Record r WHERE r.deletedAt IS NULL AND r.recordedAt >= :start AND r.recordedAt < :end")
+    List<Record> findByRecordedAtBetweenMonth(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     
     // 비삭제된 모든 기록 조회
     @Query("SELECT r FROM Record r WHERE r.deletedAt IS NULL")

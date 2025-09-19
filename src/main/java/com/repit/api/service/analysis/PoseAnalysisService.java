@@ -33,19 +33,21 @@ public class PoseAnalysisService {
      * @return 생성된 분석 ID
      */
     public long saveAnalysisResult(long recordId, String analysisText, String fileName) {
-        // 중복 방지: 동일한 파일명이 이미 존재하는지 확인
-        if (fileNameToAnalysisId.containsKey(fileName)) {
+        if (fileNameToAnalysisId.putIfAbsent(fileName, -1L) != null) {
             throw new ApiException(ErrorCode.ANALYSIS_4002);
         }
-
-        // 분석 텍스트 파싱
-        PoseAnalysis analysis = parseAnalysisText(recordId, analysisText, fileName);
-        
-        long analysisId = analysisIdSeq.incrementAndGet();
-        analysisStore.put(analysisId, analysis);
-        fileNameToAnalysisId.put(fileName, analysisId);
-        
-        return analysisId;
+        try {
+            PoseAnalysis analysis = parseAnalysisText(recordId, analysisText, fileName);
+            long analysisId = analysisIdSeq.incrementAndGet();
+            analysisStore.put(analysisId, analysis);
+            // replace reservation with real id
+            fileNameToAnalysisId.replace(fileName, -1L, analysisId);
+            return analysisId;
+        } catch (RuntimeException e) {
+            // rollback reservation
+            fileNameToAnalysisId.remove(fileName, -1L);
+            throw e;
+        }
     }
 
     /**
@@ -149,8 +151,9 @@ public class PoseAnalysisService {
             double duration = Double.parseDouble(segmentMatcher.group(2));
             String grade = segmentMatcher.group(3);
             
-            // 오류 상세 정보 추출
-            List<PoseAnalysis.ErrorDetail> errors = extractErrors(text, segment_number);
+            // 오류 상세 정보 추출 - 해당 세그먼트 블록만 전달
+            String segmentBlock = segmentMatcher.group(0);
+            List<PoseAnalysis.ErrorDetail> errors = extractErrors(segmentBlock, segment_number);
             
             segments.add(new PoseAnalysis.SegmentAnalysis(segment_number, duration, grade, errors));
         }
