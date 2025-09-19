@@ -26,19 +26,6 @@
 - **실시간 업데이트**: 운동 분석 결과 실시간 데이터베이스 반영
 - **중복 방지**: 동일한 영상의 중복 분석 방지
 
-## 🏗️ 시스템 아키텍처
-
-```mermaid
-graph TB
-    A[사용자] --> B[Spring Boot API]
-    B --> C[MySQL Database]
-    B --> D[Python AI Model]
-    D --> E[분석 결과 파일]
-    E --> F[File Watcher]
-    F --> B
-    B --> G[Swagger UI]
-```
-
 ## 🚀 빠른 시작
 
 ### 1. 저장소 클론
