@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 public class RecordController {
 
     private final RecordService recordService;
@@ -107,8 +107,10 @@ public class RecordController {
 
     @DeleteMapping("/record/{record_id}/video")
     public ApiResponse<Map<String, Object>> deleteVideo(@PathVariable("record_id") long recordId) {
-        recordService.get(recordId);
-        return ApiResponse.success("RECORD_005", "영상 삭제 처리에 성공했습니다.", Map.of("record_id", recordId));
+        // 실제 구현에서는 스토리지에서 파일을 삭제하고 videoPath를 null로 설정
+        // 현재는 videoPath를 null로 설정하여 삭제 처리
+        recordService.updateVideoPath(recordId, null);
+        return ApiResponse.success("RECORD_005", "영상 삭제 요청을 접수했습니다.", Map.of("record_id", recordId));
     }
 }
 

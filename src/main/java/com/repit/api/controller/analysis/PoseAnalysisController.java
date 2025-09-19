@@ -18,7 +18,7 @@ import java.util.Map;
  * 자세 분석 결과 API 컨트롤러
  */
 @RestController
-@RequestMapping("/api/analysis")
+@RequestMapping("/analysis")
 public class PoseAnalysisController {
 
     private final PoseAnalysisService poseAnalysisService;

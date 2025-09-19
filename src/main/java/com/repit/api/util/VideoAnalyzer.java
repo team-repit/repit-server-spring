@@ -44,10 +44,24 @@ public class VideoAnalyzer {
      * @return 초 단위 시간
      */
     public long timeStringToSeconds(String timeString) {
+        if (timeString == null) {
+            throw new IllegalArgumentException("시간 문자열은 null일 수 없습니다");
+        }
         try {
-            LocalTime time = LocalTime.parse(timeString, TIME_FORMATTER);
-            return time.toSecondOfDay();
-        } catch (DateTimeParseException e) {
+            String[] parts = timeString.split(":");
+            if (parts.length != 3) {
+                throw new IllegalArgumentException("잘못된 시간 형식입니다: " + timeString);
+            }
+            long hours = Long.parseLong(parts[0]);
+            long minutes = Long.parseLong(parts[1]);
+            long seconds = Long.parseLong(parts[2]);
+            
+            if (minutes >= 60 || seconds >= 60) {
+                throw new IllegalArgumentException("잘못된 시간 형식입니다: " + timeString);
+            }
+            
+            return hours * 3600 + minutes * 60 + seconds;
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             throw new IllegalArgumentException("잘못된 시간 형식입니다: " + timeString);
         }
     }
@@ -59,6 +73,9 @@ public class VideoAnalyzer {
      * @return HH:mm:ss 형식의 시간 문자열
      */
     public String secondsToTimeString(long seconds) {
+        if (seconds < 0) {
+            throw new IllegalArgumentException("초 단위 시간은 음수일 수 없습니다: " + seconds);
+        }
         Duration duration = Duration.ofSeconds(seconds);
         long hours = duration.toHours();
         long minutes = duration.toMinutesPart();

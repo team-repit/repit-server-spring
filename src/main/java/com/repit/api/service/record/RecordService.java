@@ -33,8 +33,12 @@ public class RecordService {
         Record record = new Record(memberId, poseType, duration, reps, totalScore, 
                                  videoPath, analysisPath, LocalDateTime.now(), null);
         
-        Record savedRecord = recordRepository.save(record);
-        return savedRecord.getRecordId();
+        try {
+            Record savedRecord = recordRepository.save(record);
+            return savedRecord.getRecordId();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new ApiException(ErrorCode.RECORD_2002);
+        }
     }
     
     public Record get(long id) {
@@ -60,12 +64,16 @@ public class RecordService {
     
     public List<Record> getRecordsByDate(int year, int month, int day) {
         java.time.LocalDate targetDate = java.time.LocalDate.of(year, month, day);
-        return recordRepository.findByRecordDate(targetDate);
+        var start = targetDate.atStartOfDay();
+        var end = targetDate.plusDays(1).atStartOfDay();
+        return recordRepository.findByRecordedAtBetween(start, end);
     }
     
     public List<java.time.LocalDate> getDaysWithRecords(int year, int month) {
-        return recordRepository.findDistinctRecordDatesByYearAndMonth(year, month)
-                .stream()
+        var start = java.time.LocalDate.of(year, month, 1).atStartOfDay();
+        var end = start.plusMonths(1);
+        return recordRepository.findByRecordedAtBetweenMonth(start, end).stream()
+                .map(Record::getRecordedAt)
                 .map(java.time.LocalDateTime::toLocalDate)
                 .distinct()
                 .sorted()
@@ -89,5 +97,12 @@ public class RecordService {
             default:
                 return 10;
         }
+    }
+
+    public void updateVideoPath(long recordId, String videoPath) {
+        Record record = recordRepository.findById(recordId)
+                .orElseThrow(() -> new ApiException(ErrorCode.RECORD_2001));
+        record.setVideoPath(videoPath);
+        recordRepository.save(record);
     }
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/calendar")
+@RequestMapping("/calendar")
 public class CalendarController {
 
     private final CalendarService calendarService;
