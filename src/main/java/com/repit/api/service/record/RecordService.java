@@ -5,12 +5,17 @@ import com.repit.api.common.ErrorCode;
 import com.repit.api.entity.PoseType;
 import com.repit.api.entity.Record;
 import com.repit.api.repository.RecordRepository;
+import com.repit.api.service.analysis.PoseAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +23,9 @@ public class RecordService {
     
     @Autowired
     private RecordRepository recordRepository;
+    
+    @Autowired
+    private PoseAnalysisService poseAnalysisService;
     
     public long create(long memberId, PoseType poseType, String videoPath, String analysisPath) {
         // 중복 생성 방지: 동일한 video_path가 이미 존재하는지 확인
@@ -104,5 +112,122 @@ public class RecordService {
                 .orElseThrow(() -> new ApiException(ErrorCode.RECORD_2001));
         record.setVideoPath(videoPath);
         recordRepository.save(record);
+    }
+
+    /**
+     * 분석 파일을 처리하여 운동 기록을 생성합니다.
+     * 
+     * @param analysisFilePath 분석 파일 경로
+     * @param memberId 회원 ID
+     * @return 생성된 운동 기록 ID
+     */
+    public long createFromAnalysisFile(String analysisFilePath, long memberId) {
+        try {
+            Path filePath = Paths.get(analysisFilePath);
+            if (!Files.exists(filePath)) {
+                throw new ApiException(ErrorCode.RECORD_2001); // 파일이 존재하지 않음
+            }
+
+            String fileName = filePath.getFileName().toString();
+            String analysisText = Files.readString(filePath);
+            
+            // 파일명에서 운동 타입 추출
+            PoseType poseType = extractPoseTypeFromFileName(fileName);
+            
+            // 비디오 경로 생성 (분석 파일명에서 .txt를 .mp4로 변경)
+            String videoPath = analysisFilePath.replace(".txt", ".mp4");
+            
+            // 1. 운동 기록 생성
+            long recordId = create(memberId, poseType, videoPath, analysisFilePath);
+            
+            // 2. 분석 결과 저장
+            long analysisId = poseAnalysisService.saveAnalysisResult(recordId, analysisText, fileName);
+            
+            // 3. 분석 결과 조회하여 총점 업데이트
+            var analysis = poseAnalysisService.getAnalysis(analysisId);
+            
+            // 4. 운동 기록의 총점 업데이트
+            Record record = get(recordId);
+            record.setTotalScore(analysis.getTotal_score());
+            recordRepository.save(record);
+            
+            return recordId;
+            
+        } catch (IOException e) {
+            throw new ApiException(ErrorCode.RECORD_2001); // 파일 읽기 실패
+        }
+    }
+
+    /**
+     * 파일명에서 운동 타입을 추출합니다.
+     * 파일명 맨 처음에 있는 운동 타입을 우선적으로 확인합니다.
+     */
+    private PoseType extractPoseTypeFromFileName(String fileName) {
+        String lowerFileName = fileName.toLowerCase();
+        
+        // 파일명 맨 처음에 있는 운동 타입을 우선적으로 확인
+        if (lowerFileName.startsWith("lunge")) {
+            return PoseType.LUNGE;
+        } else if (lowerFileName.startsWith("squat")) {
+            return PoseType.SQUAT;
+        } else if (lowerFileName.startsWith("plank")) {
+            return PoseType.PLANK;
+        } else if (lowerFileName.startsWith("pushup") || lowerFileName.startsWith("push_up")) {
+            return PoseType.PUSH_UP;
+        }
+        
+        // 파일명 맨 처음에 없으면 전체 파일명에서 검색
+        if (lowerFileName.contains("lunge")) {
+            return PoseType.LUNGE;
+        } else if (lowerFileName.contains("squat")) {
+            return PoseType.SQUAT;
+        } else if (lowerFileName.contains("plank")) {
+            return PoseType.PLANK;
+        } else if (lowerFileName.contains("pushup") || lowerFileName.contains("push_up")) {
+            return PoseType.PUSH_UP;
+        }
+        
+        return PoseType.SQUAT; // 기본값
+    }
+
+    /**
+     * Spring Integration에서 호출되는 분석 파일 처리 메서드
+     */
+    public void processAnalysisFile(String filePath) {
+        try {
+            // 기본 회원 ID (실제로는 파일에서 추출하거나 설정에서 가져와야 함)
+            long memberId = 1L;
+            
+            // 분석 파일 처리
+            long recordId = createFromAnalysisFile(filePath, memberId);
+            System.out.println("분석 파일 처리 완료. Record ID: " + recordId);
+            
+        } catch (Exception e) {
+            System.err.println("분석 파일 처리 중 오류 발생: " + filePath + " - " + e.getMessage());
+        }
+    }
+
+    /**
+     * Spring Integration에서 호출되는 MP4 파일 처리 메서드
+     */
+    public void processVideoFile(String filePath) {
+        try {
+            // 기본 회원 ID (실제로는 파일에서 추출하거나 설정에서 가져와야 함)
+            long memberId = 1L;
+            
+            // 파일명에서 운동 타입 추출
+            String fileName = Paths.get(filePath).getFileName().toString();
+            PoseType poseType = extractPoseTypeFromFileName(fileName);
+            
+            // 분석 파일 경로 생성 (MP4 파일명에서 .mp4를 .txt로 변경)
+            String analysisPath = filePath.replace(".mp4", ".txt");
+            
+            // 운동 기록 생성 (분석 파일이 없으므로 analysisPath는 null)
+            long recordId = create(memberId, poseType, filePath, null);
+            System.out.println("MP4 파일 처리 완료. Record ID: " + recordId + ", Pose Type: " + poseType);
+            
+        } catch (Exception e) {
+            System.err.println("MP4 파일 처리 중 오류 발생: " + filePath + " - " + e.getMessage());
+        }
     }
 }
