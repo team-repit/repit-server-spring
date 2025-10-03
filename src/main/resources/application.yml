@@ -28,10 +28,6 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
 
-  # 카카오 소셜 로그인
-  kakao:
-    client_id: ${REST_API_KEY}
-    redirect_uri: http://localhost:8080/api/auth/login/kakao
     
   # JPA/Hibernate 설정
   jpa:
@@ -50,19 +46,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       
-  # Thymeleaf 설정 (카카오 로그인 페이지용)
-  thymeleaf:
-    check-template-location: true
-    prefix: classpath:/templates/
-    suffix: .html
-    cache: false
 
-# 파일 감지 설정
-file:
-  watch:
-    directory: ${FILE_WATCH_DIRECTORY:/Users/pado/repit/repit-jetson/output}
-    pattern: ${FILE_WATCH_PATTERN:.*_report_\\d+\\.txt$}
-    enabled: ${FILE_WATCH_ENABLED:true}
 
 # 로깅 설정
 logging:

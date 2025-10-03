@@ -47,9 +47,6 @@ dependencies {
 	// .env 파일 지원
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 	
-	// Spring Integration for file watching
-	implementation 'org.springframework.integration:spring-integration-file'
-	implementation 'org.springframework.integration:spring-integration-core'
 }
 
 tasks.named('test') {

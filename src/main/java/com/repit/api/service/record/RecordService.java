@@ -190,44 +190,4 @@ public class RecordService {
         return PoseType.SQUAT; // 기본값
     }
 
-    /**
-     * Spring Integration에서 호출되는 분석 파일 처리 메서드
-     */
-    public void processAnalysisFile(String filePath) {
-        try {
-            // 기본 회원 ID (실제로는 파일에서 추출하거나 설정에서 가져와야 함)
-            long memberId = 1L;
-            
-            // 분석 파일 처리
-            long recordId = createFromAnalysisFile(filePath, memberId);
-            System.out.println("분석 파일 처리 완료. Record ID: " + recordId);
-            
-        } catch (Exception e) {
-            System.err.println("분석 파일 처리 중 오류 발생: " + filePath + " - " + e.getMessage());
-        }
-    }
-
-    /**
-     * Spring Integration에서 호출되는 MP4 파일 처리 메서드
-     */
-    public void processVideoFile(String filePath) {
-        try {
-            // 기본 회원 ID (실제로는 파일에서 추출하거나 설정에서 가져와야 함)
-            long memberId = 1L;
-            
-            // 파일명에서 운동 타입 추출
-            String fileName = Paths.get(filePath).getFileName().toString();
-            PoseType poseType = extractPoseTypeFromFileName(fileName);
-            
-            // 분석 파일 경로 생성 (MP4 파일명에서 .mp4를 .txt로 변경)
-            String analysisPath = filePath.replace(".mp4", ".txt");
-            
-            // 운동 기록 생성 (분석 파일이 없으므로 analysisPath는 null)
-            long recordId = create(memberId, poseType, filePath, null);
-            System.out.println("MP4 파일 처리 완료. Record ID: " + recordId + ", Pose Type: " + poseType);
-            
-        } catch (Exception e) {
-            System.err.println("MP4 파일 처리 중 오류 발생: " + filePath + " - " + e.getMessage());
-        }
-    }
 }
