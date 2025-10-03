@@ -1,0 +1,47 @@
+spring:
+  # 테스트용 H2 인메모리 데이터베이스 설정
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  # JPA/Hibernate 테스트 설정
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+    open-in-view: false
+    
+  # H2 콘솔 활성화 (테스트용)
+  h2:
+    console:
+      enabled: true
+
+# 로깅 설정 (테스트용)
+logging:
+  level:
+    com.repit.api: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+# Swagger 설정 (테스트용)
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  packages-to-scan: com.repit.api.controller
+
+# 서버 포트 설정 (테스트용)
+server:
+  port: 0  # 랜덤 포트 사용
+  servlet:
+    context-path: /api
