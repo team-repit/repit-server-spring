@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/api")
 public class RecordController {
 
     private final RecordService recordService;
