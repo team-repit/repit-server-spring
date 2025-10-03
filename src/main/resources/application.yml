@@ -68,6 +68,7 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
   packages-to-scan: com.repit.api.controller
+  use-management-port: false
 
 # 서버 포트 설정
 server:
