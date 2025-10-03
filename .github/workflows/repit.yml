@@ -115,7 +115,15 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
             docker stop spring-repit-container || true
             docker rm spring-repit-container || true
-            docker run -d -p 8080:8080 --name spring-repit-container ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
+            docker run -d -p 8080:8080 --name spring-repit-container \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e SERVER_PORT=8080 \
+              ${{ secrets.DOCKER_USERNAME }}/spring-repit:latest
 
       # ③ SSH 허용 규칙 해제
       - name: Revoke SSH rule
