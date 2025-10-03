@@ -112,6 +112,30 @@ public class RecordController {
         recordService.updateVideoPath(recordId, null);
         return ApiResponse.success("RECORD_005", "영상 삭제 요청을 접수했습니다.", Map.of("record_id", recordId));
     }
+
+    public static class ProcessAnalysisFileRequest {
+        @NotBlank(message = "analysis_file_path는 필수입니다.")
+        @Schema(description = "분석 파일 경로", example = "/path/to/squat_report_1.txt")
+        private String analysis_file_path;
+        
+        @NotNull(message = "member_id는 필수입니다.")
+        @Schema(description = "회원 ID", example = "1")
+        private Long member_id;
+
+        public String getAnalysis_file_path() { return analysis_file_path; }
+        public Long getMember_id() { return member_id; }
+    }
+
+    @PostMapping("/record/process-analysis")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> processAnalysisFile(@Valid @RequestBody ProcessAnalysisFileRequest request) {
+        long recordId = recordService.createFromAnalysisFile(
+            request.getAnalysis_file_path(),
+            request.getMember_id()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("RECORD_006", "분석 파일 처리 및 운동 기록 생성에 성공했습니다.", Map.of("record_id", recordId)));
+    }
+
 }
 
 

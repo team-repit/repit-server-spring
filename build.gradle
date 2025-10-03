@@ -27,7 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	// implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // 소셜로그인 미구현으로 주석 처리
 	// implementation 'org.springframework.boot:spring-boot-starter-security' // 소셜로그인 미구현으로 주석 처리
-	// implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // REST API만 사용하므로 제거
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // 보안 모듈 미사용
@@ -46,6 +46,7 @@ dependencies {
 	
 	// .env 파일 지원
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	
 }
 
 tasks.named('test') {

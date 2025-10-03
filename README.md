@@ -51,9 +51,9 @@ DB_PASSWORD=your_mysql_password
 # 서버 설정
 SERVER_PORT=8080
 
-# 파일 감지 설정
-FILE_WATCH_DIRECTORY=/Users/username/Desktop
-FILE_WATCH_PATTERN=.*_report_\\d+\\.txt$
+# 파일 감지 설정 (API 기반으로 변경됨)
+# FILE_WATCH_DIRECTORY=/Users/username/Desktop
+# FILE_WATCH_PATTERN=.*_report_\\d+\\.txt$
 EOF
 ```
 
@@ -224,5 +224,56 @@ src/main/java/com/repit/api/
 | `SERVER_PORT` | 서버 포트 | 8080 | ❌ |
 | `FILE_WATCH_DIRECTORY` | 파일 감지 디렉토리 | /Users/username/Desktop | ❌ |
 | `FILE_WATCH_PATTERN` | 파일 감지 패턴 | .*_report_\\d+\\.txt$ | ❌ |
+
+## 📊 분석 파일 처리
+
+### 방법 1: 직접 API 호출
+
+```bash
+# 1. 운동 기록 생성
+curl -X POST http://localhost:8080/api/analysis/create-record \
+  -H "Content-Type: application/json" \
+  -d '{
+    "memberId": 1,
+    "poseType": "SQUAT",
+    "videoPath": "/path/to/video.mp4"
+  }'
+
+# 2. 분석 파일 처리
+curl -X POST http://localhost:8080/api/analysis/process \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recordId": 1,
+    "analysisText": "분석 결과 텍스트...",
+    "fileName": "analysis_report_1.txt",
+    "analysisPath": "/path/to/analysis_report_1.txt"
+  }'
+```
+
+### 방법 2: 분석 파일 직접 처리
+
+```bash
+# 분석 파일 처리 API 호출
+curl -X POST http://localhost:8080/api/record/process-analysis \
+  -H "Content-Type: application/json" \
+  -d '{
+    "analysis_file_path": "/path/to/squat_report_1.txt",
+    "member_id": 1
+  }'
+```
+
+#### 파일명 규칙
+
+- **스쿼트**: `squat_report_1.txt`, `squat_report_2.txt`
+- **푸시업**: `pushup_report_1.txt`, `push_up_report_1.txt`
+- **플랭크**: `plank_report_1.txt`
+
+#### 처리 과정
+
+1. **분석 파일 읽기**: 지정된 경로의 txt 파일을 읽어옴
+2. **운동 타입 추출**: 파일명에서 운동 타입을 자동으로 추출
+3. **운동 기록 생성**: 회원 ID와 추출된 정보로 운동 기록 생성
+4. **분석 결과 저장**: 파일 내용을 분석하여 결과 저장
+5. **총점 업데이트**: 분석 결과의 총점으로 운동 기록 업데이트
 
 ---

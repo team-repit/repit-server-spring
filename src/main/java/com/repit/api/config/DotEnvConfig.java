@@ -22,7 +22,6 @@ public class DotEnvConfig {
         // 시스템 프로퍼티와 OS 환경변수가 모두 없을 때만 .env 값 사용
         dotenv.entries().forEach(entry -> {
             final String key = entry.getKey();
-            // Only set when neither a system property nor an OS env var exists
             if (System.getProperty(key) == null && System.getenv(key) == null) {
                 System.setProperty(key, entry.getValue());
             }
